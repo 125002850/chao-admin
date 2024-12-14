@@ -2,7 +2,7 @@
   <div class="main-box">
     <TreeFilter
       label="name"
-      title="部门列表(单选)"
+      title="部门列表"
       :request-api="getUserDepartment"
       :default-value="initParam.departmentId"
       @change="changeTreeFilter"
@@ -16,7 +16,7 @@
         :search-col="{ xs: 1, sm: 1, md: 2, lg: 3, xl: 3 }"
       >
         <!-- 表格 header 按钮 -->
-        <template #tableHeader>
+        <template #header>
           <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增用户</el-button>
           <el-button type="primary" :icon="Upload" plain @click="batchAdd">批量添加用户</el-button>
           <el-button type="primary" :icon="Download" plain @click="downloadFile">导出用户数据</el-button>

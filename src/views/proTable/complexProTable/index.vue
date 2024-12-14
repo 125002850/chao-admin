@@ -13,7 +13,7 @@
       @row-click="rowClick"
     >
       <!-- 表格 header 按钮 -->
-      <template #tableHeader="scope">
+      <template #header="scope">
         <el-button type="primary" :icon="CirclePlus" @click="proTable?.element?.toggleAllSelection">全选 / 全不选</el-button>
         <el-button type="primary" :icon="Pointer" plain @click="setCurrent">选中第五行</el-button>
         <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">

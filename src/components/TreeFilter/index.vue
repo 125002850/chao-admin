@@ -39,15 +39,27 @@
               {{ scope.node.label }}
             </slot>
           </span>
+          <div class="buttons">
+            <a v-if="!scope.data.id" @click.stop="() => handleAdd(scope)">
+              <el-icon><plus /></el-icon>
+            </a>
+
+            <a v-if="scope.data.id" @click.stop="handleEdit(scope)">
+              <el-icon><Edit /></el-icon>
+            </a>
+            <a v-if="scope.data.id" @click.stop="handleDel(scope)">
+              <el-icon><Minus /></el-icon>
+            </a>
+          </div>
         </template>
       </el-tree>
     </el-scrollbar>
   </div>
 </template>
 
-<script setup lang="ts" name="TreeFilter">
+<script setup lang="tsx" name="TreeFilter">
 import { ref, watch, onBeforeMount, nextTick } from "vue";
-import { ElTree } from "element-plus";
+import { ElMessageBox, ElTree } from "element-plus";
 
 // 接收父组件参数并设置默认值
 interface TreeFilterProps {
@@ -140,6 +152,9 @@ const toggleTreeNodes = (isExpand: boolean) => {
 // emit
 const emit = defineEmits<{
   change: [value: any];
+  insert: [];
+  edit: [value: any];
+  delete: [value: any];
 }>();
 
 // 单选
@@ -153,10 +168,24 @@ const handleCheckChange = () => {
   emit("change", treeRef.value?.getCheckedKeys());
 };
 
+const handleAdd = (scope: any) => {
+  console.log(scope);
+  emit("insert");
+};
+
+const handleEdit = scope => {
+  emit("edit", scope);
+};
+
+const handleDel = async (scope: any) => {
+  console.log(scope);
+  emit("delete", scope);
+};
+
 // 暴露给父组件使用
 defineExpose({ treeData, treeAllData, treeRef });
 </script>
 
 <style scoped lang="scss">
-@import "./index.scss";
+@import "./index";
 </style>

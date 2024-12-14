@@ -20,7 +20,7 @@
         :init-param="Object.assign(treeFilterValues, selectFilterValues)"
       >
         <!-- 表格 header 按钮 -->
-        <template #tableHeader>
+        <template #header>
           <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增用户</el-button>
           <el-button type="primary" :icon="Upload" plain @click="batchAdd">批量添加用户</el-button>
           <el-button type="primary" :icon="Download" plain @click="downloadFile">导出用户数据</el-button>

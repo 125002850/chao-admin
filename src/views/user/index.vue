@@ -1,13 +1,6 @@
 <template>
   <div class="table-box">
-    <ProTable
-      ref="proTable"
-      :columns="columns"
-      :request-api="getTableList"
-      :init-param="initParam"
-      :data-callback="dataCallback"
-      @drag-sort="sortTable"
-    >
+    <ProTable ref="proTable" :columns="columns" :request-api="getTableList" :init-param="initParam" :data-callback="dataCallback">
       <!-- 表格 header 按钮 -->
       <template #header="scope">
         <el-button v-auth="'add'" type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增用户</el-button>
@@ -120,8 +113,6 @@ const headerRender = (scope: HeaderRenderScope<User.ResUserList>) => {
 // 表格配置项
 const columns = reactive<ColumnProps<User.ResUserList>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { type: "sort", label: "Sort", width: 80 },
-  { type: "expand", label: "Expand", width: 85 },
   {
     prop: "username",
     label: "用户姓名",

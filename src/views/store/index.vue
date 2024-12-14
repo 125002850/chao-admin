@@ -2,85 +2,82 @@
   <div class="main-box">
     <TreeFilter
       label="name"
-      title="部门列表(单选)"
-      :data="treeFilterData"
+      title="店铺列表"
+      :request-api="getUserDepartment"
       :default-value="initParam.departmentId"
       @change="changeTreeFilter"
+      @insert="handleInsertStore"
+      @edit="handleEditStore"
+      @delete="handleDeleteStore"
     />
     <div class="table-box">
       <ProTable
         ref="proTable"
-        row-key="id"
-        :indent="20"
         :columns="columns"
-        :request-api="getUserTreeList"
-        :request-auto="false"
+        :request-api="getUserList"
         :init-param="initParam"
         :search-col="{ xs: 1, sm: 1, md: 2, lg: 3, xl: 3 }"
       >
         <!-- 表格 header 按钮 -->
         <template #header>
           <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增用户</el-button>
+          <el-button type="primary" :icon="Upload" plain @click="batchAdd">批量添加用户</el-button>
+          <el-button type="primary" :icon="Download" plain @click="downloadFile">导出用户数据</el-button>
+          <el-button type="primary" plain @click="toDetail">To 平级详情页面</el-button>
         </template>
         <!-- 表格操作 -->
         <template #operation="scope">
           <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
           <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
+          <el-button type="primary" link :icon="Refresh" @click="resetPass(scope.row)">重置密码</el-button>
           <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">删除</el-button>
         </template>
       </ProTable>
       <UserDrawer ref="drawerRef" />
       <ImportExcel ref="dialogRef" />
+      <StoreDialog ref="storeRef" />
     </div>
   </div>
 </template>
-
-<script setup lang="tsx" name="treeProTable">
-import { onMounted, reactive, ref } from "vue";
+<script setup lang="ts" name="useTreeFilter">
+import { ref, reactive, useTemplateRef } from "vue";
 import { User } from "@/api/interface";
-import { genderType } from "@/utils/dict";
+import { useRouter } from "vue-router";
+import { ElMessage, ElMessageBox } from "element-plus";
 import { useHandleData } from "@/hooks/useHandleData";
-import { ElMessage, ElNotification } from "element-plus";
+import { useDownload } from "@/hooks/useDownload";
 import ProTable from "@/components/ProTable/index.vue";
 import TreeFilter from "@/components/TreeFilter/index.vue";
 import ImportExcel from "@/components/ImportExcel/index.vue";
 import UserDrawer from "@/views/proTable/components/UserDrawer.vue";
-import { CirclePlus, Delete, EditPen, View } from "@element-plus/icons-vue";
-import { ColumnProps, ProTableInstance } from "@/components/ProTable/interface";
-import { getUserTreeList, deleteUser, editUser, addUser, getUserStatus, getUserDepartment } from "@/api/modules/user";
+import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
+import { CirclePlus, Delete, EditPen, Download, Upload, View, Refresh } from "@element-plus/icons-vue";
+import {
+  getUserList,
+  deleteUser,
+  editUser,
+  addUser,
+  resetUserPassWord,
+  exportUserInfo,
+  BatchAddUser,
+  getUserStatus,
+  getUserGender,
+  getUserDepartment
+} from "@/api/modules/user";
+import StoreDialog from "./StoreDialog.vue";
 
-onMounted(() => {
-  getTreeFilter();
-  ElNotification({
-    title: "温馨提示",
-    message: "该页面 ProTable 数据不会自动请求，需等待 treeFilter 数据请求完成之后，才会触发表格请求。",
-    type: "info",
-    duration: 10000
-  });
-  setTimeout(() => {
-    ElNotification({
-      title: "温馨提示",
-      message: "该页面 ProTable 性别搜索框为远程数据搜索，详情可查看代码。",
-      type: "info",
-      duration: 10000
-    });
-  }, 0);
-});
+const router = useRouter();
+
+// 跳转详情页
+const toDetail = () => {
+  router.push(`/proTable/useTreeFilter/detail/123456?params=detail-page`);
+};
 
 // ProTable 实例
 const proTable = ref<ProTableInstance>();
 
 // 如果表格需要初始化请求参数，直接定义传给 ProTable(之后每次请求都会自动带上该参数，此参数更改之后也会一直带上，改变此参数会自动刷新表格数据)
-const initParam = reactive({ departmentId: "" });
-
-// 获取 treeFilter 数据
-// 当 proTable 的 requestAuto 属性为 false，不会自动请求表格数据，等待 treeFilter 数据回来之后，更改 initParam.departmentId 的值，才会触发请求 proTable 数据
-const treeFilterData = ref<any>([]);
-const getTreeFilter = async () => {
-  const { data } = await getUserDepartment();
-  treeFilterData.value = data;
-  initParam.departmentId = treeFilterData.value[1].id;
-};
+const initParam = reactive({ departmentId: "1" });
 
 // 树形筛选切换
 const changeTreeFilter = (val: string) => {
@@ -89,34 +86,18 @@ const changeTreeFilter = (val: string) => {
   initParam.departmentId = val;
 };
 
-// 模拟远程加载性别搜索框数据
-const loading = ref(false);
-const filterGenderEnum = ref<typeof genderType>([]);
-const remoteMethod = (query: string) => {
-  filterGenderEnum.value = [];
-  if (!query) return;
-  loading.value = true;
-  setTimeout(() => {
-    loading.value = false;
-    filterGenderEnum.value = genderType.filter(item => item.label.includes(query));
-  }, 500);
-};
-
 // 表格配置项
 const columns = reactive<ColumnProps<User.ResUserList>[]>([
   { type: "index", label: "#", width: 80 },
-  { prop: "username", label: "用户姓名" },
+  { prop: "username", label: "用户姓名", width: 120, search: { el: "input" } },
   {
     prop: "gender",
     label: "性别",
+    width: 120,
     sortable: true,
-    isFilterEnum: false,
-    enum: filterGenderEnum,
-    search: {
-      el: "select",
-      props: { placeholder: "请输入性别查询", filterable: true, remote: true, reserveKeyword: true, loading, remoteMethod }
-    },
-    render: scope => <>{scope.row.gender === 1 ? "男" : "女"}</>
+    enum: getUserGender,
+    search: { el: "select" },
+    fieldNames: { label: "genderLabel", value: "genderValue" }
   },
   { prop: "idCard", label: "身份证号" },
   { prop: "email", label: "邮箱" },
@@ -124,14 +105,15 @@ const columns = reactive<ColumnProps<User.ResUserList>[]>([
   {
     prop: "status",
     label: "用户状态",
+    width: 120,
     sortable: true,
     tag: true,
     enum: getUserStatus,
-    search: { el: "tree-select" },
+    search: { el: "select" },
     fieldNames: { label: "userLabel", value: "userStatus" }
   },
   { prop: "createTime", label: "创建时间", width: 180 },
-  { prop: "operation", label: "操作", width: 300, fixed: "right" }
+  { prop: "operation", label: "操作", width: 330, fixed: "right" }
 ]);
 
 // 删除用户信息
@@ -140,16 +122,55 @@ const deleteAccount = async (params: User.ResUserList) => {
   proTable.value?.getTableList();
 };
 
+// 重置用户密码
+const resetPass = async (params: User.ResUserList) => {
+  await useHandleData(resetUserPassWord, { id: params.id }, `重置【${params.username}】用户密码`);
+  proTable.value?.getTableList();
+};
+
+// 导出用户列表
+const downloadFile = async () => {
+  ElMessageBox.confirm("确认导出用户数据?", "温馨提示", { type: "warning" }).then(() =>
+    useDownload(exportUserInfo, "用户列表", proTable.value?.searchParam)
+  );
+};
+
+// 批量添加用户
+const dialogRef = ref<InstanceType<typeof ImportExcel> | null>(null);
+const batchAdd = () => {
+  const params = {
+    title: "用户",
+    tempApi: exportUserInfo,
+    importApi: BatchAddUser,
+    getTableList: proTable.value?.getTableList
+  };
+  dialogRef.value?.acceptParams(params);
+};
+
 // 打开 drawer(新增、查看、编辑)
 const drawerRef = ref<InstanceType<typeof UserDrawer> | null>(null);
 const openDrawer = (title: string, row: Partial<User.ResUserList> = {}) => {
   const params = {
     title,
-    row: { ...row },
     isView: title === "查看",
+    row: { ...row },
     api: title === "新增" ? addUser : title === "编辑" ? editUser : undefined,
     getTableList: proTable.value?.getTableList
   };
   drawerRef.value?.acceptParams(params);
+};
+
+const storeRef = useTemplateRef("storeRef");
+
+const handleInsertStore = () => {
+  storeRef.value?.acceptParams({ form: { shopName: "" } });
+};
+
+const handleEditStore = (scope: any) => {
+  storeRef.value?.acceptParams({ form: { shopName: scope.data.name } });
+};
+
+const handleDeleteStore = async (scope: any) => {
+  await ElMessageBox.confirm("是否确认删除该店铺?");
 };
 </script>

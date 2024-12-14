@@ -5,12 +5,6 @@
     </div>
     <template #dropdown>
       <el-dropdown-menu>
-        <el-dropdown-item @click="openDialog('infoRef')">
-          <el-icon><User /></el-icon>{{ $t("header.personalData") }}
-        </el-dropdown-item>
-        <el-dropdown-item @click="openDialog('passwordRef')">
-          <el-icon><Edit /></el-icon>{{ $t("header.changePassword") }}
-        </el-dropdown-item>
         <el-dropdown-item divided @click="logout">
           <el-icon><SwitchButton /></el-icon>{{ $t("header.logout") }}
         </el-dropdown-item>
@@ -58,10 +52,10 @@ const logout = () => {
 // 打开修改密码和个人信息弹窗
 const infoRef = ref<InstanceType<typeof InfoDialog> | null>(null);
 const passwordRef = ref<InstanceType<typeof PasswordDialog> | null>(null);
-const openDialog = (ref: string) => {
-  if (ref == "infoRef") infoRef.value?.openDialog();
-  if (ref == "passwordRef") passwordRef.value?.openDialog();
-};
+// const openDialog = (ref: string) => {
+//   if (ref == "infoRef") infoRef.value?.openDialog();
+//   if (ref == "passwordRef") passwordRef.value?.openDialog();
+// };
 </script>
 
 <style scoped lang="scss">

@@ -1,44 +1,21 @@
 <template>
   <div class="table-box">
-    <ProTable
-      ref="proTable"
-      :columns="columns"
-      :request-api="getTableList"
-      :init-param="initParam"
-      :data-callback="dataCallback"
-      @drag-sort="sortTable"
-    >
+    <ProTable ref="proTable" :columns="columns" :request-api="getTableList" :init-param="initParam" :data-callback="dataCallback">
       <!-- 表格 header 按钮 -->
       <template #header="scope">
-        <el-button v-auth="'add'" type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增用户</el-button>
-        <el-button v-auth="'batchAdd'" type="primary" :icon="Upload" plain @click="batchAdd">批量添加用户</el-button>
-        <el-button v-auth="'export'" type="primary" :icon="Download" plain @click="downloadFile">导出用户数据</el-button>
-        <el-button type="primary" plain @click="toDetail">To 子集详情页面</el-button>
+        <el-button type="primary" :icon="CirclePlus" @click="openDrawer('新增')">新增品牌</el-button>
         <el-button type="danger" :icon="Delete" plain :disabled="!scope.isSelected" @click="batchDelete(scope.selectedListIds)">
-          批量删除用户
+          批量删除品牌
         </el-button>
       </template>
       <!-- Expand -->
       <template #expand="scope">
         {{ scope.row }}
       </template>
-      <!-- usernameHeader -->
-      <template #usernameHeader="scope">
-        <el-button type="primary" @click="ElMessage.success('我是通过作用域插槽渲染的表头')">
-          {{ scope.column.label }}
-        </el-button>
-      </template>
-      <!-- createTime -->
-      <template #createTime="scope">
-        <el-button type="primary" link @click="ElMessage.success('我是通过作用域插槽渲染的内容')">
-          {{ scope.row.createTime }}
-        </el-button>
-      </template>
       <!-- 表格操作 -->
       <template #operation="scope">
         <el-button type="primary" link :icon="View" @click="openDrawer('查看', scope.row)">查看</el-button>
         <el-button type="primary" link :icon="EditPen" @click="openDrawer('编辑', scope.row)">编辑</el-button>
-        <el-button type="primary" link :icon="Refresh" @click="resetPass(scope.row)">重置密码</el-button>
         <el-button type="primary" link :icon="Delete" @click="deleteAccount(scope.row)">删除</el-button>
       </template>
     </ProTable>
@@ -120,12 +97,10 @@ const headerRender = (scope: HeaderRenderScope<User.ResUserList>) => {
 // 表格配置项
 const columns = reactive<ColumnProps<User.ResUserList>[]>([
   { type: "selection", fixed: "left", width: 70 },
-  { type: "sort", label: "Sort", width: 80 },
-  { type: "expand", label: "Expand", width: 85 },
   {
     prop: "username",
-    label: "用户姓名",
-    search: { el: "input", tooltip: "我是搜索提示" },
+    label: "品牌",
+    search: { el: "input" },
     render: scope => {
       return (
         <el-button type="primary" link onClick={() => ElMessage.success("我是通过 tsx 语法渲染的内容")}>
@@ -136,64 +111,15 @@ const columns = reactive<ColumnProps<User.ResUserList>[]>([
   },
   {
     prop: "gender",
-    label: "性别",
-    // 字典数据（本地数据）
-    // enum: genderType,
-    // 字典请求不带参数
-    enum: getUserGender,
-    // 字典请求携带参数
-    // enum: () => getUserGender({ id: 1 }),
-    search: { el: "select", props: { filterable: true } },
-    fieldNames: { label: "genderLabel", value: "genderValue" }
+    label: "数量"
   },
   {
-    // 多级 prop
-    prop: "user.detail.age",
-    label: "年龄",
-    search: {
-      // 自定义 search 显示内容
-      render: ({ searchParam }) => {
-        return (
-          <div class="flx-center">
-            <el-input vModel_trim={searchParam.minAge} placeholder="最小年龄" />
-            <span class="mr10 ml10">-</span>
-            <el-input vModel_trim={searchParam.maxAge} placeholder="最大年龄" />
-          </div>
-        );
-      }
-    }
-  },
-  { prop: "idCard", label: "身份证号", search: { el: "input" } },
-  { prop: "email", label: "邮箱" },
-  { prop: "address", label: "居住地址" },
-  {
-    prop: "status",
-    label: "用户状态",
-    enum: getUserStatus,
-    search: { el: "tree-select", props: { filterable: true } },
-    fieldNames: { label: "userLabel", value: "userStatus" },
-    render: scope => {
-      return (
-        <>
-          {BUTTONS.value.status ? (
-            <el-switch
-              model-value={scope.row.status}
-              active-text={scope.row.status ? "启用" : "禁用"}
-              active-value={1}
-              inactive-value={0}
-              onClick={() => changeStatus(scope.row)}
-            />
-          ) : (
-            <el-tag type={scope.row.status ? "success" : "danger"}>{scope.row.status ? "启用" : "禁用"}</el-tag>
-          )}
-        </>
-      );
-    }
+    prop: "remark",
+    label: "备注"
   },
   {
     prop: "createTime",
     label: "创建时间",
-    headerRender,
     width: 180,
     search: {
       el: "date-picker",
