@@ -9,7 +9,7 @@
         <el-icon size="20"><More /></el-icon>
         <template #dropdown>
           <el-dropdown-menu>
-            <el-dropdown-item @click="toggleTreeNodes(true)">展开全部</el-dropdown-item>
+            /1 02 1 2 . <el-dropdown-item @click="toggleTreeNodes(true)">展开全部</el-dropdown-item>
             <el-dropdown-item @click="toggleTreeNodes(false)">折叠全部</el-dropdown-item>
           </el-dropdown-menu>
         </template>
@@ -94,10 +94,12 @@ const setSelected = () => {
 
 onBeforeMount(async () => {
   setSelected();
+
   if (props.requestApi) {
-    const { data } = await props.requestApi!();
+    const { data = [] } = await props.requestApi!();
     treeData.value = data;
     treeAllData.value = [{ id: "", [props.label]: "全部" }, ...data];
+    console.log(treeAllData.value);
   }
 });
 

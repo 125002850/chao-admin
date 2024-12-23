@@ -1,23 +1,30 @@
 import { defineStore } from "pinia";
-import { UserState } from "@/stores/interface";
 import piniaPersistConfig from "@/stores/helper/persist";
+import { Operations } from "@/enums";
+import { computed, ref } from "vue";
+import { Login } from "@/api/interface";
 
-export const useUserStore = defineStore({
-  id: "geeker-user",
-  state: (): UserState => ({
-    token: "",
-    userInfo: { name: "Geeker" }
-  }),
-  getters: {},
-  actions: {
-    // Set Token
-    setToken(token: string) {
-      this.token = token;
-    },
-    // Set setUserInfo
-    setUserInfo(userInfo: UserState["userInfo"]) {
-      this.userInfo = userInfo;
-    }
+export const useUserStore = defineStore(
+  "user",
+  () => {
+    const token = ref("");
+    const userInfo = ref<Login.ResLogin>({});
+    const isAdmin = computed(() => userInfo.value.admin);
+    const auths = computed(() =>
+      isAdmin.value ? ["1", "2", "3", "4", "5"] : (userInfo.value.operateAuthorization?.split(",") ?? [])
+    );
+
+    const setToken = (data: string) => (token.value = data);
+    const setUserInfo = (data: Login.ResLogin) => (userInfo.value = data);
+
+    return {
+      token,
+      userInfo,
+      isAdmin,
+      auths,
+      setToken,
+      setUserInfo
+    };
   },
-  persist: piniaPersistConfig("geeker-user")
-});
+  { persist: piniaPersistConfig("user") }
+);

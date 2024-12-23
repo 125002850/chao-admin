@@ -1,7 +1,7 @@
 export namespace Table {
   export interface Pageable {
+    currPage: number;
     pageNum: number;
-    pageSize: number;
     total: number;
   }
   export interface StateProps {

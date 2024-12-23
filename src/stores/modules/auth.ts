@@ -3,6 +3,7 @@ import { AuthState } from "@/stores/interface";
 import { getAuthButtonListApi, getAuthMenuListApi } from "@/api/modules/login";
 import { getFlatMenuList, getShowMenuList, getAllBreadcrumbList } from "@/utils";
 import { menus } from "../helper/constantMenus";
+import { useUserStore } from "./user.ts";
 
 export const useAuthStore = defineStore({
   id: "geeker-auth",
@@ -34,8 +35,17 @@ export const useAuthStore = defineStore({
     },
     // Get AuthMenuList
     async getAuthMenuList() {
+      const userStore = useUserStore();
       // const { data } = await getAuthMenuListApi();
-      this.authMenuList = menus;
+      this.authMenuList = menus?.filter(item => {
+        if (item.meta.isAdmin) {
+          return userStore.isAdmin;
+        }
+        if (item.meta.menuKey) {
+          return userStore.auths.includes(item.meta.menuKey);
+        }
+        return true;
+      });
     },
     // Set RouteName
     async setRouteName(name: string) {

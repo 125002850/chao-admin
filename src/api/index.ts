@@ -14,7 +14,7 @@ export interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
   cancel?: boolean;
 }
 
-const config = {
+export const config = {
   // 默认地址请求地址，可在 .env.** 文件中修改
   baseURL: import.meta.env.VITE_API_URL as string,
   // 设置超时时间
@@ -25,7 +25,7 @@ const config = {
 
 const axiosCanceler = new AxiosCanceler();
 
-class RequestHttp {
+export class RequestHttp {
   service: AxiosInstance;
   public constructor(config: AxiosRequestConfig) {
     // instantiation
@@ -46,7 +46,7 @@ class RequestHttp {
         config.loading ??= true;
         config.loading && showFullScreenLoading();
         if (config.headers && typeof config.headers.set === "function") {
-          config.headers.set("x-access-token", userStore.token);
+          config.headers.set("token", userStore.token);
         }
         return config;
       },

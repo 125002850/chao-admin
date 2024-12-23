@@ -10,7 +10,7 @@
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogFormVisible = false">取消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false"> 确认 </el-button>
+        <el-button type="primary" @click="handleConfirm"> 确认 </el-button>
       </div>
     </template>
   </el-dialog>
@@ -23,16 +23,25 @@ const dialogFormVisible = ref(false);
 const formLabelWidth = "110px";
 
 const formData = ref({
-  shopName: "123"
+  shopName: ""
 });
+
+const drawerProps = ref<AcceptParams>();
 
 type AcceptParams = {
   form: any;
+  onConfirm?: (params: any) => Promise<any>;
 };
 
-const acceptParams = ({ form }: AcceptParams) => {
-  formData.value = form;
+const acceptParams = (params: AcceptParams) => {
+  drawerProps.value = params;
+  formData.value = params.form;
   dialogFormVisible.value = true;
+};
+
+const handleConfirm = async () => {
+  await drawerProps.value?.onConfirm?.(formData.value!);
+  dialogFormVisible.value = false;
 };
 
 defineExpose({ acceptParams });
