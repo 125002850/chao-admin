@@ -18,7 +18,7 @@ export interface Result {
 }
 
 export type Image = {
-  pictureUrl: string;
+  url: string;
   isMain: number; //0 否 1 是
   sort: number;
 };

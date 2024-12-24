@@ -15,7 +15,7 @@
         </el-select>
       </el-form-item>
       <el-form-item label="系列" prop="brandInfoId" required>
-        <el-select v-model="drawerProps.data!.brandInfoId" placeholder="请选择系列" clearable filterable>
+        <el-select v-model="data!.brandInfoId" placeholder="请选择系列" clearable filterable>
           <el-option v-for="item in seriesOptions" :label="item.name" :value="item.id!" :key="item.id!"></el-option>
         </el-select>
       </el-form-item>
@@ -34,7 +34,7 @@
         <el-input-number v-model="drawerProps.data!.pubPrice" placeholder="请填写公价" clearable></el-input-number>
       </el-form-item>
       <el-form-item label="商品图片" prop="pictures" required>
-        <UploadImgs v-model:file-list="data.pictures!" width="250px">
+        <UploadImgs v-model:file-list="imgs!" width="250px">
           <template #empty>
             <el-icon><Picture /></el-icon>
             <span>请上传照片</span>
@@ -72,6 +72,15 @@ const { visible, acceptParams, drawerProps } = useDrawer<Watch.Dto>();
 
 const data = computed(() => drawerProps.value?.data);
 
+const imgs = computed({
+  get() {
+    return data.value.pictures?.map(item => ({ ...item, name: "abc" }));
+  },
+  set(val) {
+    data.value.pictures = val?.map(item => ({ ...item, isMain: 0, sort: 0 }));
+  }
+});
+
 defineExpose({
   acceptParams
 });
@@ -84,9 +93,10 @@ const groupOptions = [];
 
 watch(
   () => drawerProps?.value?.data?.brandId,
-  async val => {
-    if (drawerProps.value?.data?.brandInfoId) {
+  async (val, oldVal) => {
+    if (drawerProps.value.data.brandInfoId && oldVal) {
       drawerProps.value.data.brandInfoId = undefined;
+      seriesOptions.value = [];
     }
     if (!val) return;
     const rsp = await fetchBrandById(val!);
@@ -105,8 +115,10 @@ const handleSubmit = () => {
   ruleFormRef.value!.validate(async valid => {
     if (!valid) return;
     try {
-      await drawerProps.value.onConfirm!(drawerProps.value.data);
-      ElMessage.success({ message: `${drawerProps.value.title}品牌成功！` });
+      const params = drawerProps.value.data;
+      params.groupIds = [1];
+      await drawerProps.value.onConfirm!(params);
+      ElMessage.success({ message: `${drawerProps.value.title}手表成功！` });
       drawerProps.value.callback!();
       visible.value = false;
     } catch (error) {

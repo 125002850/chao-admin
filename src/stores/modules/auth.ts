@@ -3,7 +3,7 @@ import { AuthState } from "@/stores/interface";
 import { getAuthButtonListApi, getAuthMenuListApi } from "@/api/modules/login";
 import { getFlatMenuList, getShowMenuList, getAllBreadcrumbList } from "@/utils";
 import { menus } from "../helper/constantMenus";
-import { useUserStore } from "./user.ts";
+import { useUserStore } from "./user";
 
 export const useAuthStore = defineStore({
   id: "geeker-auth",

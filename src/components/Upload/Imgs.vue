@@ -140,11 +140,11 @@ const handleHttpUpload = async (options: UploadRequestOptions) => {
  * @param uploadFile 上传的文件
  * */
 const emit = defineEmits<{
-  "update:fileList": [value: UploadUserFile[]];
+  "update:fileList": [value: Array<UploadUserFile>];
 }>();
-const uploadSuccess = (response: { fileUrl: string } | undefined, uploadFile: UploadFile) => {
+const uploadSuccess = (response: string, uploadFile: UploadFile) => {
   if (!response) return;
-  uploadFile.url = response.fileUrl;
+  uploadFile.url = response;
   emit("update:fileList", _fileList.value);
   // 调用 el-form 内部的校验方法（可自动校验）
   formItemContext?.prop && formContext?.validateField([formItemContext.prop as string]);

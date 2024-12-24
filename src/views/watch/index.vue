@@ -24,7 +24,7 @@ import FormDrawer from "./FormDrawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
 import { CirclePlus, EditPen, View } from "@element-plus/icons-vue";
 import { editUser, addUser, changeUserStatus, getUserStatus } from "@/api/modules/user";
-import { fetchWatchList } from "@/api/modules/watch";
+import { fetchWatchAdd, fetchWatchById, fetchWatchEdit, fetchWatchList, fetchWatchStatusSwitch } from "@/api/modules/watch";
 import { fetchBrandOptions } from "@/api/modules/brand";
 import { enum2Options, WatchStatusTranslate } from "@/enums";
 
@@ -87,18 +87,19 @@ const columns = reactive<ColumnProps<Watch.Vo>[]>([
 
 // 切换状态
 const changeStatus = async (row: Watch.Vo) => {
-  await useHandleData(changeUserStatus, { id: row.id, status: row.status == 1 ? 0 : 1 }, `切换【${row.name}】状态`);
+  await useHandleData(fetchWatchStatusSwitch, { id: row.id, status: row.status }, `切换【${row.name}】状态`);
   proTable.value?.getTableList();
 };
 
 // 打开 drawer(新增、查看、编辑)
 const drawerRef = useTemplateRef("FormDrawerRef");
-const openDrawer = (title: string, row: Partial<Watch.Vo> = {}) => {
+const openDrawer = async (title: string, row: Partial<Watch.Vo> = {}) => {
+  const data = title === "新增" ? {} : ((await fetchWatchById(row.id!))?.data ?? {});
   drawerRef.value?.acceptParams({
     title,
     disabled: title === "查看",
-    data: { ...row },
-    onConfirm: title === "新增" ? addUser : title === "编辑" ? editUser : undefined,
+    data,
+    onConfirm: title === "新增" ? fetchWatchAdd : title === "编辑" ? fetchWatchEdit : undefined,
     callback: proTable.value?.getTableList
   });
 };
