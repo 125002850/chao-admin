@@ -10,9 +10,7 @@ export const useUserStore = defineStore(
     const token = ref("");
     const userInfo = ref<Login.ResLogin>({});
     const isAdmin = computed(() => userInfo.value.admin);
-    const auths = computed(() =>
-      isAdmin.value ? ["1", "2", "3", "4", "5"] : (userInfo.value.operateAuthorization?.split(",") ?? [])
-    );
+    const auths = computed(() => (isAdmin.value ? ["3", "4", "5"] : (userInfo.value.operateAuthorization?.split(",") ?? [])));
 
     const setToken = (data: string) => (token.value = data);
     const setUserInfo = (data: Login.ResLogin) => (userInfo.value = data);

@@ -12,3 +12,4 @@ export const fetchWatchStatusSwitch = ({ id, status }: { id: string; status: num
   const api = status === YesOrNo.No ? `/admin/listing/${id}` : `/admin/remove/${id}`;
   return http.get(api);
 };
+export const fetchGroupDrop = () => http.get<Watch.GroupVo[]>("/admin/drop");

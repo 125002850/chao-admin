@@ -1,5 +1,5 @@
 <template>
-  <el-drawer v-model="visible" :destroy-on-close="true" size="450px" :title="`${drawerProps.title}品牌`">
+  <el-drawer v-model="visible" :destroy-on-close="true" size="450px" :title="`${drawerProps.title}手表`">
     <el-form
       ref="ruleFormRef"
       label-width="100px"
@@ -25,11 +25,11 @@
       <el-form-item label="型号" prop="model" required>
         <el-input v-model="drawerProps.data!.model" placeholder="请填写型号" clearable></el-input>
       </el-form-item>
-      <!-- <el-form-item label="分组" prop="groupIds" required>
+      <el-form-item label="分组" prop="groupIds" required>
         <el-select v-model="drawerProps.data!.groupIds" placeholder="请选择分组" clearable filterable multiple>
-          <el-option v-for="item in groupOptions" :label="item.label" :value="item.value" :key="item.value"></el-option>
+          <el-option v-for="item in groupOptions" :label="item.name" :value="item.id" :key="item.id"></el-option>
         </el-select>
-      </el-form-item> -->
+      </el-form-item>
       <el-form-item label="公价" prop="pubPrice" required>
         <el-input-number v-model="drawerProps.data!.pubPrice" placeholder="请填写公价" clearable></el-input-number>
       </el-form-item>
@@ -57,6 +57,7 @@ import { Brand, Option, User, Watch } from "@/api/interface";
 import { Arrayable } from "element-plus/es/utils";
 import { useDrawer } from "@/hooks/useDrawer";
 import { fetchBrandById, fetchBrandOptions } from "@/api/modules/brand";
+import { fetchGroupDrop } from "@/api/modules/watch";
 import UploadImgs from "@/components/Upload/Imgs.vue";
 
 const rules = reactive({
@@ -89,7 +90,7 @@ const brandOptions = ref<Brand.Vo[]>([]);
 
 const seriesOptions = ref<Brand.Series[]>([]);
 
-const groupOptions = [];
+const groupOptions = ref<Watch.GroupVo[]>([]);
 
 watch(
   () => drawerProps?.value?.data?.brandId,
@@ -106,7 +107,11 @@ watch(
 );
 
 onMounted(async () => {
-  [brandOptions.value] = await Promise.all([fetchBrandOptions().then(rsp => rsp.data)]);
+  [brandOptions.value, groupOptions.value] = await Promise.all([
+    fetchBrandOptions().then(rsp => rsp.data),
+    fetchGroupDrop().then(rsp => rsp.data)
+  ]);
+  console.log(groupOptions.value);
 });
 
 // 提交数据（新增/编辑）
@@ -116,7 +121,6 @@ const handleSubmit = () => {
     if (!valid) return;
     try {
       const params = drawerProps.value.data;
-      params.groupIds = [1];
       await drawerProps.value.onConfirm!(params);
       ElMessage.success({ message: `${drawerProps.value.title}手表成功！` });
       drawerProps.value.callback!();

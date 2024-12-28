@@ -23,7 +23,6 @@ import ProTable from "@/components/ProTable/index.vue";
 import FormDrawer from "./FormDrawer.vue";
 import { ProTableInstance, ColumnProps } from "@/components/ProTable/interface";
 import { CirclePlus, EditPen, View } from "@element-plus/icons-vue";
-import { editUser, addUser, changeUserStatus, getUserStatus } from "@/api/modules/user";
 import { fetchWatchAdd, fetchWatchById, fetchWatchEdit, fetchWatchList, fetchWatchStatusSwitch } from "@/api/modules/watch";
 import { fetchBrandOptions } from "@/api/modules/brand";
 import { enum2Options, WatchStatusTranslate } from "@/enums";

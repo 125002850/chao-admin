@@ -189,7 +189,7 @@ export namespace Watch {
     brandInfoId?: string; //系列id
     pubPrice?: number; //公价
     groupIds?: number[]; //分组ids
-    pictures: Image[];
+    pictures?: Image[];
   }
 
   export interface Vo extends CommonVo {
@@ -203,5 +203,10 @@ export namespace Watch {
     groupNames: string[];
     groupIds: number[];
     pictures: Image[];
+  }
+
+  export interface GroupVo {
+    id: string;
+    name: string;
   }
 }

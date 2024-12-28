@@ -51,7 +51,7 @@ const columns = reactive<ColumnProps<User.ResUserList>[]>([
     }
   },
   {
-    prop: "gender",
+    prop: "goodsNum",
     label: "数量"
   },
   {
