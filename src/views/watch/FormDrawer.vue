@@ -69,7 +69,12 @@ const rules = reactive({
   pictures: [{ required: true, message: "请上传图片" }]
 }) satisfies Reactive<Record<string, Arrayable<FormItemRule>>>;
 
-const { visible, acceptParams, drawerProps } = useDrawer<Watch.Dto>();
+const { visible, acceptParams, drawerProps } = useDrawer<Watch.Dto>(async () => {
+  [brandOptions.value, groupOptions.value] = await Promise.all([
+    fetchBrandOptions().then(rsp => rsp.data),
+    fetchGroupDrop().then(rsp => rsp.data)
+  ]);
+});
 
 const data = computed(() => drawerProps.value?.data);
 
@@ -80,10 +85,6 @@ const imgs = computed({
   set(val) {
     data.value.pictures = val?.map(item => ({ ...item, isMain: 0, sort: 0 }));
   }
-});
-
-defineExpose({
-  acceptParams
 });
 
 const brandOptions = ref<Brand.Vo[]>([]);
@@ -106,14 +107,6 @@ watch(
   { immediate: true }
 );
 
-onMounted(async () => {
-  [brandOptions.value, groupOptions.value] = await Promise.all([
-    fetchBrandOptions().then(rsp => rsp.data),
-    fetchGroupDrop().then(rsp => rsp.data)
-  ]);
-  console.log(groupOptions.value);
-});
-
 // 提交数据（新增/编辑）
 const ruleFormRef = ref<FormInstance>();
 const handleSubmit = () => {
@@ -130,4 +123,8 @@ const handleSubmit = () => {
     }
   });
 };
+
+defineExpose({
+  acceptParams
+});
 </script>

@@ -8,7 +8,7 @@ interface DrawerProps<T extends object> {
   callback?: () => void;
 }
 
-export const useDrawer = <T extends object>() => {
+export const useDrawer = <T extends object>(cb?: () => void) => {
   const visible = ref(false);
 
   const defaultProps = {
@@ -23,6 +23,7 @@ export const useDrawer = <T extends object>() => {
   const acceptParams = (params: DrawerProps<T>) => {
     drawerProps.value = { ...defaultProps, ...params };
     visible.value = true;
+    cb?.();
   };
 
   return {

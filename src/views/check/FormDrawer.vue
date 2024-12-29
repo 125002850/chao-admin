@@ -66,7 +66,9 @@ const rules = reactive({
   password: [{ required: true, message: "请输入登录密码" }]
 }) satisfies Reactive<Record<string, Arrayable<FormItemRule>>>;
 
-const { visible, acceptParams, drawerProps } = useDrawer<User.ApprovalDto & { isCheck?: boolean }>();
+const { visible, acceptParams, drawerProps } = useDrawer<User.ApprovalDto & { isCheck?: boolean }>(async () => {
+  shopOptions.value = (await fetchShopOptions())?.data?.map(item => ({ label: item.shopName, value: item.id }));
+});
 
 const operateAuthorization = computed({
   get() {
@@ -78,12 +80,6 @@ const operateAuthorization = computed({
 });
 
 const operateOptions = ref<Option[]>(enum2Options(OperationTransform, { forceNumeric: false }));
-
-const roleOptions = ref<Option[]>(enum2Options(RoleTransform, { forceNumeric: false }));
-
-onMounted(async () => {
-  shopOptions.value = (await fetchShopOptions())?.data?.map(item => ({ label: item.shopName, value: item.id }));
-});
 
 // 提交数据（新增/编辑）
 const ruleFormRef = ref<FormInstance>();
