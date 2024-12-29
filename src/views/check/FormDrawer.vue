@@ -28,11 +28,6 @@
           <el-option v-for="item in operateOptions" :label="item.label" :value="item.value" :key="item.value"></el-option>
         </el-select>
       </el-form-item>
-      <el-form-item label="授权角色" prop="roleType" required>
-        <el-select v-model="drawerProps.data!.roleType" placeholder="请选择授权角色" clearable filterable multiple>
-          <el-option v-for="item in roleOptions" :label="item.label" :value="item.value" :key="item.value"></el-option>
-        </el-select>
-      </el-form-item>
       <el-form-item v-if="drawerProps.data.isCheck" label="密码" prop="password" required>
         <el-input
           v-model="drawerProps.data!.password"
